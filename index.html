@@ -1,0 +1,565 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>Webanwendungen in Clojure</title>
+
+  <link rel="stylesheet" href="css/assets/bootstrap-grid.min.css">
+
+  <link rel="stylesheet" href="reveal.js/css/reveal.css">
+
+  <!-- Theme used for syntax highlighting of code -->
+  <link rel="stylesheet" href="css/highlight/github.css">
+
+  <!-- Base Theme for presentation -->
+  <link rel="stylesheet" href="css/theme/hhu/hhu.css">
+
+  <!-- Printing and PDF exports -->
+  <script>
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match(/print-pdf/gi) ? '../../reveal.js/css/print/pdf.css' : '../../reveal.js/css/print/paper.css';
+    document.getElementsByTagName('head')[0].appendChild(link);
+  </script>
+
+  <style>
+    .bg-blue {
+      background-color: #176fc1;
+    }
+
+    .bg-red {
+      background-color: #be0a26;
+    }
+
+    .bg-green {
+      background-color: #97bf0d;
+    }
+
+    .bg-grey {
+      background-color: #d9dadb;
+    }
+
+    .box-white {
+      background-color: white;
+      border: 0.5px solid #176fc1 !important;
+    }
+
+    .controls button {
+      color: #d9dadb !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="reveal">
+    <div id="logo">
+      <object data="css/theme/hhu/img/unilogo.svg" type="image/svg+xml"></object>
+    </div>
+    <header>
+      <span></span>
+    </header>
+    <div id="slidenumber"></div>
+
+    <div class="slides">
+      <section data-state="footer">
+        <div id="title">
+          <!--<h4>Strukturierte Diskussionen &ndash; und nun?</h4>-->
+          <h3>Webanwendungen in
+            <img src="img/clojure_logo.svg" style="height: 1em;line-height:1em;margin-bottom: -10px;"> Clojure
+          </h3>
+          <hr/>
+          <p style="font-size: 0.8em;">
+            <strong>Christian Meter</strong>
+          </p>
+          <small>
+            <div>
+              <span>
+                <img src="img/twitter.svg" style="height: 1em;line-height:1em;">
+                <a href="https://twitter.com/cmeter_" style="height: 1em;line-height:2.2em;text-decoration: none !important">cmeter_</a>
+              </span>
+              <span style="padding-left: 2em">
+                <img src="img/github.svg" style="height: 1em;line-height:1em;">
+                <a href="https://github.com/n2o" style="height: 1em;line-height:2.3em;text-decoration: none !important">n2o</a>
+              </span>
+            </div>
+            Institut für Informatik
+            <br>Heinrich-Heine-Universität Düsseldorf
+            <br>meter@cs.uni-duesseldorf.de
+          </small>
+        </div>
+      </section>
+
+      <section data-state="intro">
+        <style>
+          .intro header span:after {
+            content: "Clojure: Crashkurs";
+          }
+        </style>
+        <p>funktional</p>
+        <p>dynamisch typisiert</p>
+        <p>auf der JVM gehostet</p>
+        <p>ein Lisp-Dialekt</p>
+        <p>&nbsp;</p>
+        <pre><code>     (println "Willkommen beim Clojure Meetup Düsseldorf!")</code></pre>
+      </section>
+
+      <section data-state="intro">
+        <pre><code>(+ 1 2)                         ;; Funktionsaufruf
+> 3</code></pre>
+        <pre><code>(def x 42)
+x
+> 42</code></pre>
+        <pre><code>(defn square [num] (* num num))     ;; Funktion definieren
+(def square (fn [num] (* num num))  ;; Anonyme Funktion
+(def square #(* % %))               ;; Kurzschreibweise
+
+(square 4)
+> 16</code></pre>
+        <pre><code>(map square [1 2 3])            ;; HOF: Funktionen als Parameter
+> (1 4 9)</code></pre>
+      </section>
+
+      <section data-state="webanwendungen">
+        <style>
+          .webanwendungen header span:after {
+            content: "Webanwendungen";
+          }
+        </style>
+        <p>
+          Es gibt für Clojure keine Komplettlösungen wie<br>
+          <a href="https://www.djangoproject.com/">Django</a>,
+          <a href="https://phoenixframework.org/">Phoenix</a>,
+          <a href="https://rubyonrails.org/">Ruby on Rails</a>
+          …
+        </p>
+        <p>Aber: es gibt eine Menge Bibliotheken, die man selbst komponieren kann</p>
+
+        <div class="row">
+          <div class="col-6">
+            <strong>Vorteile?</strong>
+          </div>
+          <div class="col-6">
+            <strong>Nachteile?</strong>
+          </div>
+        </div>
+      </section>
+
+      <section data-state="webanwendungen">
+        <p>Aber: es gibt eine Menge Bibliotheken, die man selbst komponieren kann</p>
+        <div class="row">
+          <div class="col-6">
+            <div>
+              <strong>Vorteile?</strong>
+            </div>
+            <ul>
+              <li>Flexibilität</li>
+              <li>die richtige Bibliothek für mein Problem<br><br></li>
+              <li>…</li>
+            </ul>
+          </div>
+          <div class="col-6">
+            <div>
+              <strong>Nachteile?</strong>
+            </div>            
+            <ul>
+              <li>Zu viel Auswahl</li>
+              <li>Viel Recherchearbeit</li>
+              <li>Keine "einfachen" Lösungen vorhanden</li>
+              <li>…</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section data-state="datenbanken">
+        <style>
+          .datenbanken header span:after {
+            content: "Webanwendungen: Datenbanken";
+          }
+        </style>
+        <p>Mein persönliches Hindernis:<br>Datenbanken und Datenbankmodelle</p>
+        <p>Wie definiere ich mir meine Datenbankmodelle?</p>
+        <p>Wie spare ich es mir mich um "dumme" Aufgaben zu kümmern (bspw. CRUD)</p>
+        <p>Wie verpacke ich es idiomatisch in eine Webanwendung in Clojure?</p>
+      </section>
+
+      <section data-state="orm">
+        <style>
+          .orm header span:after {
+            content: "Webanwendungen: Modelle";
+          }
+        </style>
+        <p>In Django definiere ich mir mein Model und die Migration wird automatisch generiert</p>
+        <pre><code># models.py
+class Todo(models.Model):
+    title = models.TextField("Titel", null=False)
+    done = models.BooleanField("Erledigt?", default=False, null=False)</code></pre>
+<pre><code>λ python manage.py makemigrations
+λ python manage.py migrate</code></pre>
+        <p>Wenn die App im Adminbereich registriert wurde, bekomme ich ein CRUD-Interface geschenkt</p>
+      </section>
+
+      <section data-state="orm">
+        <p>In Clojure nutzen wir keine Objekte</p>
+        <p>Ein ORM wäre demnach irgendwie nicht richtig</p>
+        <p>Also müssen wir händisch ran:</p>
+        <pre><code>(defentity todo
+  (table :todos)
+  (entity-fields :title :done))
+
+(defn create-table! []
+  (exec-raw "CREATE TABLE IF NOT EXISTS todos(id SERIAL, title TEXT NOT NULL, done BOOLEAN DEFAULT FALSE NOT NULL)"))</code></pre>
+        <small>Kein automatisches CRUD-Interface für uns :-(</small>
+      </section>
+
+      <section data-state="webanwendungen">
+        <p>Überlegen wir nun, wie man eine einfache Webanwendung mit Datenbankanbindung entwickeln kann</p>
+        <p>&nbsp;</p>
+        <p><strong>Ziel</strong></p>
+        <ul>
+          <li>Todo-Liste, Webanwendung, serverseitig gerendert</li>
+          <li>Todos werden in einer Datenbank persistiert</li>
+          <li>Todos können angelegt und abgehakt werden</li>
+        </ul>
+      </section>
+
+      <section data-state="datenbankverbindung-java">
+        <style>
+          .datenbankverbindung-java header span:after {
+            content: "Datenbankverbindung: Java";
+          }
+        </style>
+        <p>In Java würden wir eine Klasse für unsere Entität definieren</p>
+        <pre><code>public class Foo {
+  private URL url;                      // Static config
+  private Socket connection;            // Run state
+  public Foo(Url url) { /* ... */ }
+  public void connect() { /* ... */ }   // Lifecycle
+  public void shutdown() { /* ... */ }
+}</code></pre>
+      </section>
+
+      <section data-state="datenbankverbindung-clojure">
+        <style>
+          .datenbankverbindung-clojure header span:after {
+            content: "Datenbankverbindung: Clojure";
+          }
+        </style>
+        <p>In Clojure könnte man alles global definieren</p>
+        <pre><code>(ns my-app.database)         ;; Not instantiable
+
+(def url "...")              ;; Global singletons
+(def connection (atom nil))
+
+(defn connect! []            ;; Global effects
+  (swap! connection ...))
+(defn shutdown! []
+  (swap! connection ...))</code></pre>
+  <small>Clojure-Namespaces sind keine Klassen!</small>
+      </section>
+
+      <section data-state="datenbankverbindung-clojure">
+        <p>Typischerweise wird alles in einer Map gespeichert und durchgereicht</p>
+        <pre><code>(defn start-db [state]
+  (let [host (get-in state [:db :host])]
+    (assoc-in state [:db :conn]
+              (db/connect host))))
+
+(defn get-user [state name]
+  (let [conn (get-in state [:db :conn])]
+    (db/query conn "..." name)))</code></pre>
+    <small><small>aus: <a href="https://www.youtube.com/watch?v=13cmHf_kt-Q">Stuart Sierra - Components Just Enough Structure</a></small></small>
+      </section>
+
+      <section data-state="webanwendung-starten">
+        <style>
+            .webanwendung-starten header span:after {
+              content: "Webanwendung starten";
+            }
+          </style>
+        <p>Ein Einstiegspunkt startet unsere Webanwendung und alle Services, die benötigt werden</p>
+        <pre><code>(defn start-all []
+  (-> {}
+    start-db           ;; Manuelle Sortierung
+    start-queues
+    start-thread-pool
+    ...
+    start-web-server))</code></pre>
+    <small><small>aus: <a href="https://www.youtube.com/watch?v=13cmHf_kt-Q">Stuart Sierra - Components Just Enough Structure</a></small></small>
+      </section>
+
+      <section data-state="probleme">
+        <style>
+          .probleme header span:after {
+            content: "Probleme?";
+          }
+        </style>
+        <p>Abhängigkeiten der Services werden nicht aufgelöst :-(</p>
+        <p>state-Map durchreichen unkomfortable</p>
+        <p>Sehr strukturlos</p>
+        <p>globaler Zustand</p>
+      </section>
+
+      <section data-state="component">
+        <style>
+          .component header span:after {
+            content: "Mehr Struktur mit Component";
+          }
+        </style>
+        <p>Bibliothek "Component" adressiert dieses Problem:</p>
+        <ul>
+          <li>Immutable Datenstrukturen (Maps oder Records)</li>
+          <li>Öffentliche API</li>
+          <li>"Dependency Injection" Framework</li>
+          <li>Einfacher Lifecycle für Komponenten</li>
+          <li>Abhängigkeiten zu anderen Komponenten</li>
+          <li>Objekte mit Fokus auf Verhalten</li>
+        </ul>
+      </section>
+
+      <section data-state="state-wrapper">
+        <style>
+          .state-wrapper header span:after {
+            content: "State Wrapper";
+          }
+        </style>
+        <p>Zustand wird verpackt</p> 
+        <pre><code class="clojure">(defrecord DB [host conn] ...)  ;; Encapsulate state</code></pre>
+      </section>
+
+      <section data-state="public-api">
+          <style>
+            .public-api header span:after {
+              content: "Öffentliche API";
+            }
+          </style>
+          <p>Nimmt Komponente als Argument</p>
+          <p>Kann Seiteneffekte haben</p>
+          <p>Kann auf internen Zustand zugreifen</p>
+          <pre><code>(defrecord DB [host conn] ...)
+
+(defn query [db & ...]
+  (.doQuery (:conn db) ...))
+
+(defn insert [db & ...]
+  (.doStatement (:conn db) ...))</code></pre>
+  <small><small>aus: <a href="https://www.youtube.com/watch?v=13cmHf_kt-Q">Stuart Sierra - Components Just Enough Structure</a></small></small>
+        </section>
+
+        <section data-state="lifecycle-constructor">
+          <style>
+            .lifecycle-constructor header span:after {
+              content: "Lifecycle: Konstruktor";
+            }
+          </style>
+          <p>Konstruktor definieren</p>
+          <pre><code class="clojure">(defrecord DB [host conn] ...)
+
+(defn db [host]
+  (map->DB {:host host}))   ;; Creates initial state</code></pre>
+          <small>map-> nimmt eine Map entgegen und benennt die Parameter entsprechend für den Record</small>
+        </section>
+
+        <section data-state="lifecycle-transitions">
+          <style>
+            .lifecycle-transitions header span:after {
+              content: "Lifecycle: Transitionen";
+            }
+          </style>
+          <p>Nimmt eine Komponente und liefert immer eine Komponente zurück</p>
+
+          <pre><code>(defprotocol Lifecycle
+  (start [component])
+  (stop [component]))
+
+(defrecord DB [host conn]
+  component/Lifecycle   ;; Implement Lifecycle protocol
+  (start [this]
+    (assoc this :conn (Driver/connect host))  ;; May have side effects
+  (stop [this]
+    (.stop conn)
+    this)))</code></pre>
+          <small><small>aus: <a href="https://www.youtube.com/watch?v=13cmHf_kt-Q">Stuart Sierra - Components Just Enough Structure</a></small></small>
+        </section>
+
+        <section data-state="constructor-dependencies">
+          <style>
+            .constructor-dependencies header span:after {
+              content: "Konstruktor: Abhängigkeiten";
+            }
+          </style>
+          <p>Abhängigkeiten werden nicht direkt<br> an den Konstruktor gegeben</p> 
+          <pre><code>(defn customers []
+  (component/using
+    (map->Customers {})
+    [:db :email]))  ;; Declare dependencies by name (adds metadata)</code></pre>
+    <small><small>aus: <a href="https://www.youtube.com/watch?v=13cmHf_kt-Q">Stuart Sierra - Components Just Enough Structure</a></small></small>
+        </section>
+
+        <section data-state="combining-components">
+          <style>
+            .combining-components header span:after {
+              content: "Komponenten verknüpfen: System Map";
+            }
+          </style>
+          <p>Kontrolliert Lifecycle</p> 
+          <p>Löst Abhängigkeiten in korrekter Reihenfolge auf</p>
+          <pre><code>(defn system [...]
+  (component/system-map
+    :customers (customers)  ;; Associate names with components
+    :db (db ...)
+    :email (->Email)
+    ...))</code></pre>
+    <small><small>aus: <a href="https://www.youtube.com/watch?v=13cmHf_kt-Q">Stuart Sierra - Components Just Enough Structure</a></small></small>
+        </section>
+
+        <section data-state="starting-system">
+          <style>
+            .starting-system header span:after {
+              content: "System starten / stoppen";
+            }
+          </style>
+          <p>Ruft start-Methode auf allen Komponenten auf</p>
+          <p>Assoziiere Abhängigkeiten (injection)</p>
+          <pre><code>(component/start (system) ...)</code></pre>
+          <p>&nbsp;</p>
+          <small>System stoppen: gleiche Prozedur in umgekehrter Reihenfolge</small>
+        </section>
+
+        <section data-state="associative-injection">
+          <style>
+            .associative-injection header span:after {
+              content: "Testsystem";
+            }
+          </style>
+          <p>Assoziiere alternative Komponenten<br>vor dem Start in die System Map</p>
+          <pre><code>(defn test-system [...]
+  (assoc (system)
+    :email (stub-email)
+    :db (test-db)))</code></pre>
+        </section>
+
+        <section data-state="stub-mail">
+          <style>
+            .stub-mail header span:after {
+              content: "Stub-Service für Testing";
+            }
+          </style>
+          <p>Stub-Email legt Nachricht auf einen core.async-Channel</p>
+          <pre><code>(defprotocol Send
+  (send [email-service address body]))
+
+(defrecord StubEmail [channel]  ;; Stub implementation
+  Send
+  (send [_ address body]
+    (>!! channel {:address address
+                  :body body})))
+
+(defn stub-email []  ;; Constructor
+  (->StubEmail (chan 32)))</code></pre>
+  <small><small>aus: <a href="https://www.youtube.com/watch?v=13cmHf_kt-Q">Stuart Sierra - Components Just Enough Structure</a></small></small>
+        </section>
+
+        <section data-state="test-db">
+          <style>
+            .test-db header span:after {
+              content: "Testdatenbank";
+            }
+          </style>
+          <p>Testdatenbank lädt Testdaten und<br>implementiert Lifecycle-Protokoll</p>
+          <pre><code>(defrecord TestDB [host conn]
+  component/Lifecycle
+  (start [this]
+    (let [conn (Driver/connect host)]
+      (load-seen-data conn)   ;; Creates for each use
+      (assoc this :conn conn)))
+
+  (stop [this]
+    (drop-database conn)  ;; Destroy for each use
+    (.stop conn)
+    this))</code></pre>
+    <small><small>aus: <a href="https://www.youtube.com/watch?v=13cmHf_kt-Q">Stuart Sierra - Components Just Enough Structure</a></small></small>
+          </section>
+
+        <section data-state="testing-business-logic">
+          <style>
+            .testing-business-logic header span:after {
+              content: "Beispieltest";
+            }
+          </style>
+          <p>Erzeuge Testsystem und führe Test aus.<br>Anschließend wird das System gestoppt.</p>
+          <pre><code>(deftest t-notify-customer
+  (let [system (component/start (test-system))
+        {:keys [customers email]} system
+        {:keys [channel]} email]
+    (try
+      (notify customers "bob" "Hi, Bob!")
+      (is (= "Hi, Bob!"
+              (:message (&lt;!! channel))))
+      (finally
+        (component/stop system)))))</code></pre>
+        <small><small>aus: <a href="https://www.youtube.com/watch?v=13cmHf_kt-Q">Stuart Sierra - Components Just Enough Structure</a></small></small>
+          </section>
+
+          <section data-state="demo">
+            <style>
+              .demo header span:after {
+                content: "Demo";
+              }
+            </style>
+            <p>
+              <strong>Entwickeln wir die TODO-Webanwendung!</strong>
+            </p>
+            <p>
+              <a href="https://github.com/n2o/component-todo-app">https://github.com/n2o/component-todo-app</a>
+            </p>
+          </section>
+
+          <section data-state="werbung">
+            <style>
+              .werbung header span:after {
+                content: "Grinding the Monolith with Michael Nygard";
+              }
+            </style>
+            <img src="img/grinding-the-monolith.png" style="width: 500px;">
+            <small>
+              <a href="https://www.meetup.com/de-DE/scaladus/events/254195173">https://www.meetup.com/de-DE/scaladus/events/254195173</a>
+            </small>
+          </section>
+
+    </div>
+  </div>
+
+  <script src="reveal.js/lib/js/head.min.js"></script>
+  <script src="reveal.js/js/reveal.js"></script>
+
+  <script>
+    // More info https://github.com/hakimel/reveal.js#configuration
+    Reveal.initialize({
+      controls: true,
+      controlsTutorial: false,
+      controlsBackArrows: 'visible',
+      history: true,
+      center: true,
+      // slideNumber: true,
+      transition: 'fade', // none/fade/slide/convex/concave/zoom
+      // More info https://github.com/hakimel/reveal.js#dependencies
+      dependencies: [
+        /* { src: 'plugin/markdown/marked.js' },
+         { src: 'plugin/markdown/markdown.js' },*/
+        { src: 'reveal.js/plugin/notes/notes.js', async: true },
+        {
+          src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function () {
+            hljs.initHighlightingOnLoad();
+          }
+        }
+      ]
+    });
+  </script>
+</body>
+
+</html>
